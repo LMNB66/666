@@ -1,0 +1,9 @@
+"main.obj",
+"lcd1602.obj",
+"Delay.obj",
+"Interrupt.obj",
+"function.obj",
+"Key.obj" 
+TO "Project" 
+RAMSIZE(256) 
+DISABLEWARNING (15,16) 

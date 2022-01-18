@@ -1,0 +1,92 @@
+C51 COMPILER V9.01   MAIN                                                                  05/15/2021 22:55:15 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.OBJ
+COMPILER INVOKED BY: D:\软件\keil\C51\BIN\C51.EXE main.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          /***************************************************************************
+   2          ****************************                           *****************************
+   3          ***************************              电子秒表           ****************************
+   4          ****************************                               *****************************
+   5          ***************************************************************************/
+   6          
+   7          /***************************************************************************
+   8          *
+   9          *简介：基于51单片机lcd1602和矩阵按键的电子秒表，可显示最大99.59.99分钟，可自
+  10          *          定义记录N组最大9组时间，采用定时器0对矩阵按键消抖，不再用往常的延时消
+  11          *          抖，从而减少了显示的时间的误差。显示误差大概为每100分钟慢7秒。
+  12          *          对矩阵按键排序，第一行为1，2，3，4，第二行5，6...以此类推，下面是定义
+  13          *      的按键的功能：9-开始与暂停，10-记录时间，11-清零，13-菜单（页码）加一
+  14          *      14-菜单减一，15-向后翻阅时间，16-向前翻阅时间记录。
+  15          ***************************************************************************/
+  16          #include "lcd1602.h"
+  17          #include "Interrupt.h"
+  18          #include "function.h"
+  19          #include "Key.h"
+  20          
+  21          void main()
+  22          {
+  23   1              Timer0_Init();
+  24   1              Timer1_Init();//定时器初始化
+  25   1              lcd1602_Init();//lcd初始化
+  26   1              Init_face();//进入时画面
+  27   1              major_face();//画面过后显示主页面
+  28   1              Time_face(2, 5, ssec, sec, min);//同上
+  29   1              while(1)
+  30   1              {
+  31   2                      Key_scan();//按键检查
+  32   2                      Key_fun();//按键功能
+  33   2                      if(TR1==1)
+  34   2                      {
+  35   3                              Time_face(2, 5, ssec, sec, min);//更新计时时间
+  36   3                      }
+  37   2              }
+  38   1      }
+  39          
+  40          void Timer0() interrupt 1
+  41          {
+  42   1              TL0 = 0x00;
+  43   1              TH0 = 0xCA;
+  44   1              TR0=0;
+  45   1              Key();
+  46   1      }
+  47          
+  48          void Timer1() interrupt 3
+  49          {
+  50   1              TL1 = 0x00;
+  51   1              TH1 = 0xDC;
+  52   1              ssec++;
+  53   1              if(ssec==100)
+  54   1              {
+  55   2                      ssec=0;
+C51 COMPILER V9.01   MAIN                                                                  05/15/2021 22:55:15 PAGE 2   
+
+  56   2                      sec++;
+  57   2                      if(sec==60)
+  58   2                      {
+  59   3                              sec=0;
+  60   3                              min++;
+  61   3                              if(min==100)
+  62   3                              {
+  63   4                                      min=0;
+  64   4                              }
+  65   3                      }
+  66   2              }
+  67   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    190    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
